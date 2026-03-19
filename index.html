@@ -222,7 +222,7 @@ main{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:36px 20p
       <div style="font-size:2rem;margin-bottom:12px;opacity:.4">🔒</div>
       <h3>Área de administración</h3>
       <p>Ingresa la contraseña para continuar</p>
-      <input type="password" id="pw" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')checkPw()"/>
+      <input type="password" id="pw-input" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')checkPw()"/>
       <button class="btn btn-ac" onclick="checkPw()" style="width:100%;padding:10px;">Entrar</button>
       <div class="pw-err" id="pw-err"></div>
     </div>
@@ -412,7 +412,7 @@ function closeZoom(){document.getElementById('zov').classList.add('hidden');}
 
 // ── AUTH ──────────────────────────────────────────────────
 function checkPw(){
-  const v=document.getElementById('pw').value;
+  const v=document.getElementById('pw-input').value;
   if(hs(v)===PW_HASH){
     unlocked=true;
     document.getElementById('lock').style.display='none';
@@ -420,14 +420,14 @@ function checkPw(){
     renderAlist();
   }else{
     document.getElementById('pw-err').textContent='Contraseña incorrecta.';
-    document.getElementById('pw').value='';
+    document.getElementById('pw-input').value='';
   }
 }
 function logout(){
   unlocked=false;
   document.getElementById('lock').style.display='';
   document.getElementById('apanel').classList.remove('on');
-  document.getElementById('pw').value='';
+  document.getElementById('pw-input').value='';
   showView('gallery');
 }
 
