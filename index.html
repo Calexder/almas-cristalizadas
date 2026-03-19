@@ -84,12 +84,12 @@ main{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:36px 20p
 .flip-nav:hover{border-color:var(--accent);color:var(--accent);}
 .flip-nav:disabled{opacity:.25;cursor:default;}
 
-.book-stage{perspective:1800px;width:min(420px,85vw);}
+.book-stage{perspective:1800px;width:min(700px,88vw);}
 .page-wrap{transform-style:preserve-3d;width:100%;}
 .page-face{width:100%;background:#0d0d18;border-radius:2px;
   box-shadow:0 20px 60px rgba(0,0,0,0.7),4px 0 20px rgba(0,0,0,0.5);
   overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:280px;}
-.page-face canvas{max-width:100%;display:block;}
+.page-face canvas{width:100%;height:auto;display:block;}
 .pg-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:10px;color:var(--dim);padding:60px;font-size:.8rem;}
 
@@ -159,7 +159,8 @@ main{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:36px 20p
   font-size:.72rem;padding:4px 10px;border-radius:2px;cursor:pointer;transition:all .2s;}
 .del-btn:hover{border-color:#cc5050;color:#ee8080;}
 
-@media(max-width:600px){.book-stage{width:min(300px,90vw);}.flipbook-wrapper{gap:8px;}}
+@media(max-width:600px){.book-stage{width:94vw;}.flipbook-wrapper{gap:4px;}
+  .flip-nav{width:32px;height:32px;font-size:.9rem;}}
 </style>
 </head>
 <body>
@@ -202,7 +203,7 @@ main{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:36px 20p
       <button class="flip-nav" id="btn-next" onclick="flip(1)" title="Página siguiente">←</button>
       <div class="book-stage">
         <div class="page-wrap" id="pw">
-          <div class="page-face" id="pf">
+          <div class="page-face" id="pf" onclick="openZoom()" style="cursor:zoom-in">
             <div class="pg-ph"><div style="font-size:1.5rem;opacity:.3">◆</div><span>Selecciona un capítulo</span></div>
           </div>
         </div>
@@ -361,11 +362,15 @@ async function openChap(num){
 async function renderPg(n){
   if(!pdfDoc)return;
   const page=await pdfDoc.getPage(n);
-  const maxW=Math.min(window.innerWidth*.8,800);
-  const scale=maxW/page.getViewport({scale:1}).width;
+  // Medir el ancho real disponible del contenedor
+  const stage=document.querySelector('.book-stage');
+  const availW=stage?stage.clientWidth:Math.min(window.innerWidth*0.88,700);
+  const nativeVp=page.getViewport({scale:1});
+  const scale=availW/nativeVp.width;
   const vp=page.getViewport({scale});
   const c=document.createElement('canvas');
   c.width=vp.width;c.height=vp.height;
+  c.style.width='100%';c.style.height='auto';
   await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
   curCanvas=c;
   setFace('');
@@ -404,11 +409,19 @@ function flip(dir){
 
 // ── ZOOM ──────────────────────────────────────────────────
 function openZoom(){
-  if(!curCanvas)return;
-  document.getElementById('zimg').src=curCanvas.toDataURL();
+  const c=curCanvas||document.getElementById('pf').querySelector('canvas');
+  if(!c){return;}
+  const img=document.getElementById('zimg');
+  img.src=c.toDataURL('image/jpeg',0.95);
   document.getElementById('zov').classList.remove('hidden');
+  document.body.style.overflow='hidden';
 }
-function closeZoom(){document.getElementById('zov').classList.add('hidden');}
+function closeZoom(){
+  document.getElementById('zov').classList.add('hidden');
+  document.body.style.overflow='';
+}
+// Click en la imagen del zoom NO cierra (solo el fondo)
+document.getElementById('zimg').addEventListener('click',e=>e.stopPropagation());
 
 // ── AUTH ──────────────────────────────────────────────────
 function checkPw(){
