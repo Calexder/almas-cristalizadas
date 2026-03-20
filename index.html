@@ -43,7 +43,6 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 .view{display:none;}
 .view.active{display:block;animation:fadeUp .3s ease;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
 .sec{font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.38em;color:var(--accent);
   text-transform:uppercase;margin-bottom:22px;display:flex;align-items:center;gap:12px;}
 .sec::after{content:'';flex:1;height:1px;background:var(--border);}
@@ -64,36 +63,25 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 .empty{grid-column:1/-1;text-align:center;padding:80px 20px;border:1px dashed var(--border);border-radius:4px;color:var(--dim);}
 .empty p{font-size:.88rem;line-height:1.9;}
 
-/* READER — ocupa viewport completo */
+/* READER */
 #reader-view{width:100%;}
 .rhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
 .rhead h2{font-family:'Cinzel',serif;font-size:.95rem;color:var(--accent);}
 .rhead-btns{display:flex;gap:8px;flex-wrap:wrap;}
 
-.flipbook-wrapper{
-  display:grid;
-  grid-template-columns:44px 1fr 44px;
-  align-items:center;
-  gap:8px;
-  width:100%;
-}
+.flipbook-wrapper{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;gap:8px;width:100%;}
 .flip-nav{background:none;border:1px solid var(--border);color:var(--text);
-  width:44px;height:44px;border-radius:2px;cursor:pointer;font-size:1.1rem;
+  width:40px;height:40px;border-radius:2px;cursor:pointer;font-size:1rem;
   transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .flip-nav:hover{border-color:var(--accent);color:var(--accent);}
 .flip-nav:disabled{opacity:.2;cursor:default;}
 
-.book-stage{
-  width:100%;
-  perspective:2000px;
-}
+.book-stage{width:100%;perspective:2000px;}
 .page-wrap{transform-style:preserve-3d;width:100%;}
-.page-face{
-  width:100%;background:#0a0a14;border-radius:3px;
-  box-shadow:0 24px 70px rgba(0,0,0,0.8),6px 0 24px rgba(0,0,0,0.4);
+.page-face{width:100%;background:#0a0a14;border-radius:3px;
+  box-shadow:0 24px 70px rgba(0,0,0,0.8);
   overflow:hidden;display:flex;align-items:center;justify-content:center;
-  min-height:200px;cursor:zoom-in;
-}
+  min-height:200px;cursor:zoom-in;}
 .page-face canvas{width:100%;height:auto;display:block;}
 .pg-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:12px;color:var(--dim);padding:80px 40px;font-size:.8rem;cursor:default;}
@@ -112,29 +100,48 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 .page-ind{font-family:'Cinzel',serif;font-size:.75rem;color:var(--dim);text-align:center;margin-top:8px;}
 .hint{text-align:center;font-size:.65rem;color:var(--dim);opacity:.45;margin-top:6px;letter-spacing:.08em;}
 
-/* ZOOM OVERLAY — siempre por encima de todo */
+/* ZOOM OVERLAY con pinch/wheel */
 #zoom-overlay{
-  display:none;
-  position:fixed;inset:0;z-index:9999;
+  display:none;position:fixed;inset:0;z-index:9999;
   background:rgba(0,0,0,0.96);
-  align-items:center;justify-content:center;
-  cursor:zoom-out;
+  overflow:hidden;touch-action:none;
 }
-#zoom-overlay.open{display:flex;}
-#zoom-overlay img{
-  max-width:96vw;max-height:96vh;
+#zoom-overlay.open{display:flex;align-items:center;justify-content:center;}
+#zoom-canvas-wrap{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  width:100%;height:100%;
+  overflow:hidden;
+}
+#zoom-img{
+  display:block;
+  max-width:100%;max-height:100%;
   object-fit:contain;
-  border-radius:2px;
-  pointer-events:none;
+  transform-origin:center center;
+  transition:transform .1s ease;
+  cursor:grab;
+  user-select:none;
 }
-#zoom-close{
-  position:fixed;top:16px;right:20px;
-  background:none;border:1px solid rgba(255,255,255,0.2);
-  color:#fff;font-size:1.2rem;width:36px;height:36px;
+#zoom-img.grabbing{cursor:grabbing;}
+#zoom-controls{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  display:flex;gap:10px;z-index:10000;
+}
+#zoom-controls button{
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+  color:#fff;font-size:1.1rem;width:40px;height:40px;
+  border-radius:50%;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;
+}
+#zoom-controls button:hover{background:rgba(255,255,255,0.2);}
+#zoom-close-btn{
+  position:fixed;top:16px;right:20px;z-index:10000;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+  color:#fff;font-size:1rem;width:36px;height:36px;
   border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:all .2s;z-index:10000;
+  transition:all .2s;
 }
-#zoom-close:hover{background:rgba(255,255,255,0.1);}
+#zoom-close-btn:hover{background:rgba(255,255,255,0.18);}
 
 /* BUTTONS */
 .btn{background:none;border:1px solid var(--border);color:var(--text);
@@ -162,13 +169,10 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 .fg input{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);
   font-family:'Noto Serif JP',serif;font-size:.85rem;padding:9px 13px;border-radius:2px;outline:none;transition:border-color .2s;}
 .fg input:focus{border-color:var(--accent);}
-.drop{border:2px dashed var(--border);border-radius:4px;padding:44px 20px;text-align:center;
-  cursor:pointer;transition:all .2s;margin-bottom:14px;}
-.drop:hover,.drop.over{border-color:var(--accent);background:rgba(126,184,212,0.04);}
-.drop p{font-size:.82rem;color:var(--dim);}
-.drop .di{font-size:2rem;margin-bottom:10px;}
-.pu-bar{width:100%;height:3px;background:var(--bg2);border-radius:1px;margin-top:8px;overflow:hidden;display:none;}
-.pu-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));width:0%;transition:width .15s;}
+.info-box{background:rgba(126,184,212,0.05);border:1px solid rgba(126,184,212,0.15);
+  border-radius:3px;padding:14px 16px;font-size:.75rem;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+.info-box strong{color:var(--accent);}
+.info-box code{background:rgba(126,184,212,0.1);color:var(--accent);padding:1px 5px;border-radius:2px;font-size:.72rem;}
 .st{padding:10px 14px;border-radius:2px;font-size:.78rem;margin-top:10px;display:none;}
 .st.ok{display:block;background:rgba(80,180,120,0.12);border:1px solid rgba(80,180,120,0.3);color:#80e0a0;}
 .st.err{display:block;background:rgba(220,80,80,0.1);border:1px solid rgba(220,80,80,0.25);color:#e09090;}
@@ -178,12 +182,10 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 .del-btn{background:none;border:1px solid rgba(200,80,80,0.3);color:#cc7070;
   font-size:.72rem;padding:4px 10px;border-radius:2px;cursor:pointer;transition:all .2s;}
 .del-btn:hover{border-color:#cc5050;color:#ee8080;}
-.warn{font-size:.72rem;color:var(--gold);background:rgba(201,168,76,0.08);
-  border:1px solid rgba(201,168,76,0.2);border-radius:2px;padding:8px 12px;margin-top:8px;line-height:1.5;}
 
 @media(max-width:600px){
   .flipbook-wrapper{grid-template-columns:32px 1fr 32px;gap:4px;}
-  .flip-nav{width:32px;height:32px;font-size:.9rem;}
+  .flip-nav{width:32px;height:32px;font-size:.85rem;}
 }
 </style>
 </head>
@@ -218,7 +220,7 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
       </div>
       <div class="rhead-btns">
         <button class="btn" onclick="showView('gallery')">← Capítulos</button>
-        <button class="btn btn-ac" id="zoom-btn" onclick="openZoom()">🔍 Zoom</button>
+        <button class="btn btn-ac" onclick="openZoom()">🔍 Zoom</button>
       </div>
     </div>
     <div class="flipbook-wrapper">
@@ -254,27 +256,27 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 
     <div class="admin-panel" id="apanel">
       <div class="sec">Panel de administración</div>
+
       <div class="panel">
-        <h3>Subir capítulo (PDF)</h3>
+        <h3>Registrar capítulo</h3>
+        <div class="info-box">
+          <strong>Cómo funciona:</strong><br>
+          1. Sube tu PDF a GitHub en la carpeta <code>pdfs/</code> con el nombre <code>cap-N.pdf</code><br>
+          2. Aquí registras el número y título — la web lo encontrará automáticamente<br>
+          3. ¡Listo! Tus lectores ya pueden verlo
+        </div>
         <div class="fg"><label>Número de capítulo</label>
           <input type="number" id="cn" placeholder="ej. 1" min="1"/></div>
-        <div class="fg"><label>Título</label>
-          <input type="text" id="ct" placeholder="ej. Soy la mejor de este lugar"/></div>
-        <div class="drop" id="dropz" onclick="document.getElementById('pdfin').click()">
-          <div class="di">📄</div>
-          <p>Haz clic o arrastra tu PDF aquí</p>
-          <p style="font-size:.7rem;opacity:.5;margin-top:6px">Un PDF por capítulo</p>
-        </div>
-        <input type="file" id="pdfin" accept="application/pdf" style="display:none"/>
-        <div id="pdfname" style="font-size:.75rem;color:var(--dim);margin-bottom:6px;"></div>
-        <div class="pu-bar" id="pubar"><div class="pu-fill" id="pufill"></div></div>
-        <div class="warn">⚠ Los PDFs se guardan en este navegador. Para que tus lectores los vean,
-          deben abrirse desde el mismo dispositivo donde los subiste, o usar GitHub Pages con los PDFs subidos al repo.</div>
-        <button class="btn btn-ac" onclick="saveChap()" style="width:100%;padding:11px;margin-top:14px;">✦ Guardar capítulo</button>
+        <div class="fg"><label>Título del capítulo</label>
+          <input type="text" id="ct" placeholder='ej. Soy la mejor de este lugar'/></div>
+        <div class="fg"><label>Páginas (opcional, para mostrar en galería)</label>
+          <input type="number" id="cpg" placeholder="ej. 24" min="1"/></div>
+        <button class="btn btn-ac" onclick="saveChap()" style="width:100%;padding:11px;">✦ Registrar capítulo</button>
         <div class="st" id="st"></div>
       </div>
+
       <div class="panel">
-        <h3>Capítulos guardados</h3>
+        <h3>Capítulos registrados</h3>
         <div id="alist"></div>
       </div>
       <button class="btn" onclick="logout()" style="font-size:.7rem;color:var(--dim);">Cerrar sesión</button>
@@ -283,23 +285,34 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 </main>
 
 <!-- ZOOM OVERLAY -->
-<div id="zoom-overlay" onclick="closeZoom()">
-  <button id="zoom-close" onclick="closeZoom()">✕</button>
-  <img id="zoom-img" src="" alt="zoom"/>
+<div id="zoom-overlay">
+  <button id="zoom-close-btn" onclick="closeZoom()">✕</button>
+  <div id="zoom-canvas-wrap">
+    <img id="zoom-img" src="" alt="zoom" draggable="false"/>
+  </div>
+  <div id="zoom-controls">
+    <button onclick="zoomIn()" title="Acercar">+</button>
+    <button onclick="zoomReset()" title="Restablecer">⊙</button>
+    <button onclick="zoomOut()" title="Alejar">−</button>
+  </div>
 </div>
 
 <script>
 // ── CONFIG ────────────────────────────────────────────
-const PW_HASH = hs('Golem heart:re');
+const PW_HASH   = hs('Golem heart:re');
+const PDF_BASE  = 'pdfs/'; // carpeta en el repo de GitHub
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 // ── STATE ─────────────────────────────────────────────
 let chapters = [], curPage = 0, totalPages = 0;
 let pdfDoc = null, flipping = false, unlocked = false;
-let pendingB64 = null;
-// curDataUrl guarda la imagen de la página actual para el zoom
 let curDataUrl = null;
+
+// Zoom state
+let zScale = 1, zX = 0, zY = 0;
+let isDragging = false, dragStartX = 0, dragStartY = 0, dragOriginX = 0, dragOriginY = 0;
+let lastPinchDist = null;
 
 // ── HASH ──────────────────────────────────────────────
 function hs(s){
@@ -308,39 +321,35 @@ function hs(s){
   return h.toString(16);
 }
 
-// ── STORAGE ───────────────────────────────────────────
-// Guardamos solo metadata + b64 del PDF. Si localStorage falla (cuota),
-// avisamos en vez de silenciosamente perder datos.
+// ── STORAGE (solo metadata, pesa nada) ────────────────
 function loadStorage(){
-  try{
-    const raw = localStorage.getItem('ac_v3');
-    chapters = raw ? JSON.parse(raw) : [];
-  } catch(e){ chapters=[]; }
+  try{ chapters = JSON.parse(localStorage.getItem('ac_meta')||'[]'); }
+  catch(e){ chapters=[]; }
 }
 function saveStorage(){
-  try{
-    localStorage.setItem('ac_v3', JSON.stringify(chapters));
-    return true;
-  } catch(e){
-    // localStorage lleno (PDFs muy grandes)
-    showSt('⚠ Error al guardar: el PDF es demasiado grande para el almacenamiento local. Prueba comprimir el PDF antes de subirlo.','err');
-    return false;
-  }
+  localStorage.setItem('ac_meta', JSON.stringify(chapters));
 }
 
 // ── INIT ──────────────────────────────────────────────
 (function init(){
   loadStorage();
   renderGallery();
-  setupDrop();
-  document.getElementById('pdfin').addEventListener('change', e=>{
-    const f=e.target.files[0]; if(f) loadPdfFile(f);
-  });
+  setupZoomEvents();
   document.addEventListener('keydown', e=>{
-    if(!document.getElementById('reader-view').classList.contains('active')) return;
-    if(e.key==='ArrowLeft')  flip(1);
-    if(e.key==='ArrowRight') flip(-1);
-    if(e.key==='Escape')     closeZoom();
+    const inReader = document.getElementById('reader-view').classList.contains('active');
+    const zoomOpen = document.getElementById('zoom-overlay').classList.contains('open');
+    if(zoomOpen){
+      if(e.key==='Escape') closeZoom();
+      if(e.key==='+' || e.key==='=') zoomIn();
+      if(e.key==='-') zoomOut();
+      if(e.key==='0') zoomReset();
+      return;
+    }
+    if(inReader){
+      if(e.key==='ArrowLeft')  flip(1);
+      if(e.key==='ArrowRight') flip(-1);
+      if(e.key==='z' || e.key==='Z') openZoom();
+    }
   });
 })();
 
@@ -371,81 +380,76 @@ function renderGallery(){
     <div class="card" onclick="openChap(${ch.num})">
       <div class="thumb" id="th-${ch.num}">
         <div class="num">${ch.num}</div>
-        <div class="ltxt">Cargando…</div>
+        <div class="ltxt">Cargando portada…</div>
       </div>
       <div class="cinfo">
         <div class="cnum">CAPÍTULO ${ch.num}</div>
         <div class="ctitle">${ch.title||'Sin título'}</div>
-        <div class="cpages" id="pg-${ch.num}">— páginas</div>
+        <div class="cpages">${ch.pages ? ch.pages+' páginas' : '—'}</div>
       </div>
     </div>`).join('');
-  sorted.forEach(ch => renderThumb(ch));
+  sorted.forEach(ch => loadThumb(ch));
 }
 
-async function renderThumb(ch){
-  if(!ch.b64) return;
+async function loadThumb(ch){
+  const url = PDF_BASE+'cap-'+ch.num+'.pdf';
   try{
-    const pdf = await pdfjsLib.getDocument({data: b64toArr(ch.b64)}).promise;
-    const pgEl = document.getElementById('pg-'+ch.num);
-    if(pgEl) pgEl.textContent = pdf.numPages+' páginas';
-    const p = await pdf.getPage(1);
-    const vp = p.getViewport({scale: 0.5});
-    const c = document.createElement('canvas');
+    const pdf = await pdfjsLib.getDocument(url).promise;
+    const p   = await pdf.getPage(1);
+    const vp  = p.getViewport({scale:0.5});
+    const c   = document.createElement('canvas');
     c.width=vp.width; c.height=vp.height;
     await p.render({canvasContext:c.getContext('2d'), viewport:vp}).promise;
     const th = document.getElementById('th-'+ch.num);
     if(th){ th.innerHTML=''; th.appendChild(c); }
-  } catch(e){}
+  } catch(e){
+    const th = document.getElementById('th-'+ch.num);
+    if(th){ th.querySelector('.ltxt').textContent='Sin portada'; }
+  }
 }
 
 // ── READER ────────────────────────────────────────────
 async function openChap(num){
   const ch = chapters.find(c=>c.num===num);
-  if(!ch||!ch.b64){ alert('No hay datos para este capítulo.'); return; }
+  if(!ch){ alert('Capítulo no encontrado.'); return; }
   curPage=1; pdfDoc=null; curDataUrl=null;
   document.getElementById('r-title').textContent = `Cap. ${ch.num} — ${ch.title||''}`;
   document.getElementById('nav-read').style.display='';
   showView('reader');
-  setFaceHtml('<div class="pg-ph"><div style="font-size:1.5rem;opacity:.4">◆</div><span>Cargando…</span></div>');
+  setFace('<div class="pg-ph"><div style="font-size:1.5rem;opacity:.4">◆</div><span>Cargando PDF…</span></div>');
+  const url = PDF_BASE+'cap-'+num+'.pdf';
   try{
-    pdfDoc = await pdfjsLib.getDocument({data: b64toArr(ch.b64)}).promise;
+    pdfDoc    = await pdfjsLib.getDocument(url).promise;
     totalPages = pdfDoc.numPages;
     await renderPage(1);
   } catch(e){
-    setFaceHtml('<div class="pg-ph">Error al cargar el PDF.</div>');
+    setFace('<div class="pg-ph" style="cursor:default">No se encontró el PDF.<br><span style="font-size:.7rem;opacity:.6">Asegúrate de que pdfs/cap-'+num+'.pdf existe en el repo.</span></div>');
   }
 }
 
 async function renderPage(n){
   if(!pdfDoc) return;
-  const page = await pdfDoc.getPage(n);
-
-  // Ancho disponible = ancho de book-stage (ocupa casi todo el viewport)
-  const stage = document.querySelector('.book-stage');
+  const page   = await pdfDoc.getPage(n);
+  const stage  = document.querySelector('.book-stage');
   const availW = stage ? stage.getBoundingClientRect().width : window.innerWidth * 0.9;
-
-  const nativeVp = page.getViewport({scale:1});
-  const scale = availW / nativeVp.width;
-  const vp = page.getViewport({scale});
-
+  const native = page.getViewport({scale:1});
+  const scale  = availW / native.width;
+  const vp     = page.getViewport({scale});
   const canvas = document.createElement('canvas');
   canvas.width  = vp.width;
   canvas.height = vp.height;
-  await page.render({canvasContext: canvas.getContext('2d'), viewport: vp}).promise;
-
-  // Guardar dataURL para el zoom ANTES de agregar al DOM
-  curDataUrl = canvas.toDataURL('image/jpeg', 0.92);
-
+  await page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise;
+  // Guardar dataURL para zoom — alta calidad
+  curDataUrl = canvas.toDataURL('image/png');
   canvas.style.width  = '100%';
   canvas.style.height = 'auto';
   canvas.style.display = 'block';
-
-  setFaceHtml('');
+  setFace('');
   document.getElementById('page-face').appendChild(canvas);
   updIndicator();
 }
 
-function setFaceHtml(html){
+function setFace(html){
   document.getElementById('page-face').innerHTML = html;
   curDataUrl = null;
 }
@@ -457,13 +461,12 @@ function updIndicator(){
   document.getElementById('btn-prev').disabled = curPage <= 1;
 }
 
-// RTL: dir=1 → siguiente (flipa izquierda), dir=-1 → anterior
 function flip(dir){
   if(flipping || !pdfDoc) return;
   const next = curPage + dir;
-  if(next < 1 || next > totalPages) return;
+  if(next<1 || next>totalPages) return;
   flipping = true;
-  const wrap = document.getElementById('page-wrap');
+  const wrap   = document.getElementById('page-wrap');
   const clsOut = dir===1 ? 'flip-out'   : 'flip-out-r';
   const clsIn  = dir===1 ? 'flip-in'    : 'flip-in-r';
   wrap.classList.add(clsOut);
@@ -482,109 +485,153 @@ function flip(dir){
 // ── ZOOM ──────────────────────────────────────────────
 function openZoom(){
   if(!curDataUrl) return;
-  document.getElementById('zoom-img').src = curDataUrl;
+  zScale=1; zX=0; zY=0;
+  const img = document.getElementById('zoom-img');
+  img.src = curDataUrl;
+  applyZoomTransform();
   document.getElementById('zoom-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow='hidden';
 }
 function closeZoom(){
   document.getElementById('zoom-overlay').classList.remove('open');
-  document.body.style.overflow = '';
+  document.body.style.overflow='';
+}
+function applyZoomTransform(){
+  const img = document.getElementById('zoom-img');
+  img.style.transform = `translate(${zX}px,${zY}px) scale(${zScale})`;
+}
+function zoomIn() { zScale = Math.min(zScale*1.3, 6); applyZoomTransform(); }
+function zoomOut(){ zScale = Math.max(zScale/1.3, 0.5); applyZoomTransform(); }
+function zoomReset(){ zScale=1; zX=0; zY=0; applyZoomTransform(); }
+
+function setupZoomEvents(){
+  const ov  = document.getElementById('zoom-overlay');
+  const img = document.getElementById('zoom-img');
+
+  // Click fondo cierra
+  ov.addEventListener('click', e=>{
+    if(e.target===ov) closeZoom();
+  });
+
+  // Rueda del mouse = zoom
+  ov.addEventListener('wheel', e=>{
+    e.preventDefault();
+    if(e.deltaY < 0) zoomIn(); else zoomOut();
+  },{passive:false});
+
+  // Drag para mover imagen
+  img.addEventListener('mousedown', e=>{
+    isDragging=true; dragStartX=e.clientX; dragStartY=e.clientY;
+    dragOriginX=zX; dragOriginY=zY;
+    img.classList.add('grabbing');
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', e=>{
+    if(!isDragging) return;
+    zX = dragOriginX + (e.clientX - dragStartX);
+    zY = dragOriginY + (e.clientY - dragStartY);
+    applyZoomTransform();
+  });
+  window.addEventListener('mouseup', ()=>{
+    isDragging=false;
+    document.getElementById('zoom-img').classList.remove('grabbing');
+  });
+
+  // Touch: pinch zoom + drag
+  ov.addEventListener('touchstart', e=>{
+    if(e.touches.length===2){
+      lastPinchDist = getPinchDist(e.touches);
+    } else if(e.touches.length===1){
+      isDragging=true;
+      dragStartX=e.touches[0].clientX; dragStartY=e.touches[0].clientY;
+      dragOriginX=zX; dragOriginY=zY;
+    }
+  },{passive:true});
+
+  ov.addEventListener('touchmove', e=>{
+    if(e.touches.length===2){
+      e.preventDefault();
+      const dist = getPinchDist(e.touches);
+      if(lastPinchDist){
+        const ratio = dist/lastPinchDist;
+        zScale = Math.min(Math.max(zScale*ratio, 0.5), 6);
+        applyZoomTransform();
+      }
+      lastPinchDist = dist;
+    } else if(e.touches.length===1 && isDragging){
+      zX = dragOriginX + (e.touches[0].clientX - dragStartX);
+      zY = dragOriginY + (e.touches[0].clientY - dragStartY);
+      applyZoomTransform();
+    }
+  },{passive:false});
+
+  ov.addEventListener('touchend', e=>{
+    if(e.touches.length < 2) lastPinchDist=null;
+    if(e.touches.length===0) isDragging=false;
+  },{passive:true});
+}
+
+function getPinchDist(touches){
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
 }
 
 // ── AUTH ──────────────────────────────────────────────
 function checkPw(){
   const v = document.getElementById('pw-input').value;
-  if(hs(v) === PW_HASH){
-    unlocked = true;
-    document.getElementById('lock').style.display = 'none';
+  if(hs(v)===PW_HASH){
+    unlocked=true;
+    document.getElementById('lock').style.display='none';
     document.getElementById('apanel').classList.add('on');
     renderAlist();
-    document.getElementById('pw-err').textContent = '';
+    document.getElementById('pw-err').textContent='';
   } else {
-    document.getElementById('pw-err').textContent = 'Contraseña incorrecta.';
-    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-err').textContent='Contraseña incorrecta.';
+    document.getElementById('pw-input').value='';
   }
 }
 function logout(){
-  unlocked = false;
-  document.getElementById('lock').style.display = '';
+  unlocked=false;
+  document.getElementById('lock').style.display='';
   document.getElementById('apanel').classList.remove('on');
-  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-input').value='';
   showView('gallery');
 }
 
-// ── UPLOAD ────────────────────────────────────────────
-function setupDrop(){
-  const z = document.getElementById('dropz');
-  if(!z) return;
-  z.addEventListener('dragover', e=>{ e.preventDefault(); z.classList.add('over'); });
-  z.addEventListener('dragleave', ()=> z.classList.remove('over'));
-  z.addEventListener('drop', e=>{
-    e.preventDefault(); z.classList.remove('over');
-    const f = e.dataTransfer.files[0];
-    if(f && f.type==='application/pdf') loadPdfFile(f);
-  });
-}
-
-function loadPdfFile(file){
-  document.getElementById('pdfname').textContent = '📄 '+file.name;
-  const bar  = document.getElementById('pubar');
-  const fill = document.getElementById('pufill');
-  bar.style.display = 'block';
-  fill.style.width  = '0%';
-  const reader = new FileReader();
-  reader.onprogress = e=>{
-    if(e.lengthComputable) fill.style.width = (e.loaded/e.total*100)+'%';
-  };
-  reader.onload = ev=>{
-    fill.style.width = '100%';
-    setTimeout(()=> bar.style.display='none', 500);
-    pendingB64 = ev.target.result.split(',')[1];
-  };
-  reader.readAsDataURL(file);
-}
-
+// ── ADMIN ─────────────────────────────────────────────
 function saveChap(){
   const num   = parseInt(document.getElementById('cn').value);
   const title = document.getElementById('ct').value.trim();
-  if(!num || num<1){ showSt('Ingresa un número de capítulo válido.','err'); return; }
-  if(!pendingB64){   showSt('Selecciona un PDF primero.','err'); return; }
-
+  const pages = parseInt(document.getElementById('cpg').value)||null;
+  if(!num||num<1){ showSt('Ingresa un número de capítulo válido.','err'); return; }
+  if(!title){      showSt('Ingresa un título.','err'); return; }
   const idx  = chapters.findIndex(c=>c.num===num);
-  const data = {num, title, b64: pendingB64};
-
+  const data = {num, title, pages};
   if(idx>=0){
-    if(!confirm(`Capítulo ${num} ya existe. ¿Reemplazarlo?`)) return;
-    chapters[idx] = data;
-  } else {
-    chapters.push(data);
-  }
-
-  if(!saveStorage()) return; // falla silenciosamente si hay error de cuota
-
-  showSt(`✦ Capítulo ${num} guardado correctamente.`, 'ok');
-  pendingB64 = null;
-  document.getElementById('cn').value      = '';
-  document.getElementById('ct').value      = '';
-  document.getElementById('pdfname').textContent = '';
-  document.getElementById('pdfin').value   = '';
-  renderAlist();
-  renderGallery();
+    if(!confirm(`Capítulo ${num} ya existe. ¿Reemplazar?`)) return;
+    chapters[idx]=data;
+  } else { chapters.push(data); }
+  saveStorage();
+  showSt(`✦ Capítulo ${num} registrado. Recuerda subir pdfs/cap-${num}.pdf a GitHub.`,'ok');
+  document.getElementById('cn').value='';
+  document.getElementById('ct').value='';
+  document.getElementById('cpg').value='';
+  renderAlist(); renderGallery();
 }
 
-function showSt(msg, type){
-  const el = document.getElementById('st');
-  el.textContent = msg;
-  el.className = 'st '+type;
-  setTimeout(()=> el.className='st', 5000);
+function showSt(msg,type){
+  const el=document.getElementById('st');
+  el.textContent=msg; el.className='st '+type;
+  setTimeout(()=>el.className='st',6000);
 }
 
 function renderAlist(){
   if(!unlocked) return;
-  const el = document.getElementById('alist');
+  const el     = document.getElementById('alist');
   const sorted = [...chapters].sort((a,b)=>a.num-b.num);
   if(!sorted.length){
-    el.innerHTML='<div style="font-size:.8rem;color:var(--dim)">No hay capítulos aún.</div>';
+    el.innerHTML='<div style="font-size:.8rem;color:var(--dim)">No hay capítulos registrados.</div>';
     return;
   }
   el.innerHTML = sorted.map(ch=>`
@@ -595,19 +642,9 @@ function renderAlist(){
 }
 
 function delChap(num){
-  if(!confirm(`¿Eliminar capítulo ${num}? No se puede deshacer.`)) return;
-  chapters = chapters.filter(c=>c.num!==num);
-  saveStorage();
-  renderAlist();
-  renderGallery();
-}
-
-// ── UTILS ─────────────────────────────────────────────
-function b64toArr(b64){
-  const bin = atob(b64);
-  const arr = new Uint8Array(bin.length);
-  for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
-  return arr;
+  if(!confirm(`¿Eliminar registro del capítulo ${num}? (El PDF en GitHub no se borra.)`)) return;
+  chapters=chapters.filter(c=>c.num!==num);
+  saveStorage(); renderAlist(); renderGallery();
 }
 </script>
 </body>
