@@ -54,29 +54,17 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 .card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:0 10px 32px rgba(126,184,212,0.13);}
 .card.read{border-color:rgba(111,207,138,0.35);}
 .card.read:hover{border-color:var(--green);}
-
-/* Badge leído */
-.read-badge{
-  position:absolute;top:8px;right:8px;z-index:2;
+.read-badge{position:absolute;top:8px;right:8px;z-index:2;
   background:rgba(10,10,18,0.85);border:1px solid var(--green);
   color:var(--green);font-size:.6rem;letter-spacing:.12em;
-  padding:3px 7px;border-radius:2px;
-  display:none;text-transform:uppercase;font-family:'Cinzel',serif;
-  backdrop-filter:blur(4px);
-}
+  padding:3px 7px;border-radius:2px;display:none;text-transform:uppercase;
+  font-family:'Cinzel',serif;backdrop-filter:blur(4px);}
 .card.read .read-badge{display:block;}
-
-/* Botón marcar leído en la tarjeta */
-.mark-btn{
-  display:block;width:100%;
-  background:none;border:none;border-top:1px solid var(--border);
+.mark-btn{display:block;width:100%;background:none;border:none;border-top:1px solid var(--border);
   color:var(--dim);font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:.12em;
-  padding:9px;cursor:pointer;transition:all .2s;text-transform:uppercase;
-  text-align:center;
-}
+  padding:9px;cursor:pointer;transition:all .2s;text-transform:uppercase;text-align:center;}
 .mark-btn:hover{color:var(--green);background:rgba(111,207,138,0.05);}
 .card.read .mark-btn{color:var(--green);background:rgba(111,207,138,0.06);}
-
 .thumb{width:100%;aspect-ratio:3/4;background:var(--bg2);display:flex;flex-direction:column;
   align-items:center;justify-content:center;overflow:hidden;position:relative;}
 .thumb canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
@@ -94,24 +82,20 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 .rhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
 .rhead h2{font-family:'Cinzel',serif;font-size:.95rem;color:var(--accent);}
 .rhead-btns{display:flex;gap:8px;flex-wrap:wrap;}
-
 .flipbook-wrapper{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;gap:8px;width:100%;}
 .flip-nav{background:none;border:1px solid var(--border);color:var(--text);
   width:40px;height:40px;border-radius:2px;cursor:pointer;font-size:1rem;
   transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .flip-nav:hover{border-color:var(--accent);color:var(--accent);}
 .flip-nav:disabled{opacity:.2;cursor:default;}
-
 .book-stage{width:100%;perspective:2000px;}
 .page-wrap{transform-style:preserve-3d;width:100%;}
 .page-face{width:100%;background:#0a0a14;border-radius:3px;
-  box-shadow:0 24px 70px rgba(0,0,0,0.8);
-  overflow:hidden;display:flex;align-items:center;justify-content:center;
-  min-height:200px;cursor:zoom-in;}
+  box-shadow:0 24px 70px rgba(0,0,0,0.8);overflow:hidden;
+  display:flex;align-items:center;justify-content:center;min-height:200px;cursor:zoom-in;}
 .page-face canvas{width:100%;height:auto;display:block;}
 .pg-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:12px;color:var(--dim);padding:80px 40px;font-size:.8rem;cursor:default;}
-
 .flip-out{animation:fOut .25s ease-in forwards;transform-origin:left center;}
 .flip-in{animation:fIn .25s ease-out forwards;transform-origin:left center;}
 .flip-out-r{animation:fOutR .25s ease-in forwards;transform-origin:right center;}
@@ -120,7 +104,6 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 @keyframes fIn{from{transform:rotateY(-88deg)}to{transform:rotateY(0)}}
 @keyframes fOutR{from{transform:rotateY(0)}to{transform:rotateY(-88deg)}}
 @keyframes fInR{from{transform:rotateY(88deg)}to{transform:rotateY(0)}}
-
 .progress-bar{width:100%;height:2px;background:var(--bg3);margin-top:12px;border-radius:1px;overflow:hidden;}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));transition:width .3s;}
 .page-ind{font-family:'Cinzel',serif;font-size:.75rem;color:var(--dim);text-align:center;margin-top:8px;}
@@ -146,11 +129,51 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
   display:flex;align-items:center;justify-content:center;transition:all .2s;}
 #zoom-close-btn:hover{background:rgba(255,255,255,0.18);}
 
+/* BUTTONS */
 .btn{background:none;border:1px solid var(--border);color:var(--text);
   font-family:'Noto Serif JP',serif;font-size:.78rem;padding:8px 15px;
   cursor:pointer;border-radius:2px;transition:all .2s;}
 .btn:hover{border-color:var(--accent);color:var(--accent);}
 .btn-ac{border-color:var(--accent);color:var(--accent);}
+
+/* ADMIN */
+.lock-screen{max-width:360px;margin:60px auto;background:var(--bg3);
+  border:1px solid var(--border);border-radius:4px;padding:40px 28px;text-align:center;}
+.lock-screen h3{font-family:'Cinzel',serif;font-size:1rem;letter-spacing:.12em;color:var(--accent);margin-bottom:8px;}
+.lock-screen p{font-size:.78rem;color:var(--dim);margin-bottom:22px;}
+.lock-screen input{width:100%;background:var(--bg2);border:1px solid var(--border);
+  color:var(--text);font-family:'Noto Serif JP',serif;font-size:.9rem;padding:11px 14px;
+  border-radius:2px;outline:none;text-align:center;letter-spacing:.2em;
+  transition:border-color .2s;margin-bottom:12px;}
+.lock-screen input:focus{border-color:var(--accent);}
+.pw-err{font-size:.72rem;color:#e06060;margin-top:8px;min-height:18px;}
+.admin-panel{display:none;}
+.admin-panel.on{display:block;}
+.panel{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:28px;margin-bottom:20px;}
+.panel h3{font-family:'Cinzel',serif;font-size:.85rem;letter-spacing:.15em;color:var(--accent);
+  margin-bottom:18px;text-transform:uppercase;}
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:.72rem;letter-spacing:.1em;color:var(--dim);
+  margin-bottom:5px;text-transform:uppercase;}
+.fg input{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);
+  font-family:'Noto Serif JP',serif;font-size:.85rem;padding:9px 13px;
+  border-radius:2px;outline:none;transition:border-color .2s;}
+.fg input:focus{border-color:var(--accent);}
+.info-box{background:rgba(126,184,212,0.05);border:1px solid rgba(126,184,212,0.15);
+  border-radius:3px;padding:14px 16px;font-size:.75rem;color:var(--dim);
+  line-height:1.7;margin-bottom:16px;}
+.info-box code{background:rgba(126,184,212,0.1);color:var(--accent);
+  padding:1px 5px;border-radius:2px;font-size:.72rem;}
+.st{padding:10px 14px;border-radius:2px;font-size:.78rem;margin-top:10px;display:none;}
+.st.ok{display:block;background:rgba(80,180,120,0.12);border:1px solid rgba(80,180,120,0.3);color:#80e0a0;}
+.st.err{display:block;background:rgba(220,80,80,0.1);border:1px solid rgba(220,80,80,0.25);color:#e09090;}
+.chap-row{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:2px;font-size:.82rem;margin-bottom:8px;}
+.cr-num{font-family:'Cinzel',serif;font-size:.7rem;color:var(--gold);margin-right:12px;}
+.del-btn{background:none;border:1px solid rgba(200,80,80,0.3);color:#cc7070;
+  font-size:.72rem;padding:4px 10px;border-radius:2px;cursor:pointer;transition:all .2s;}
+.del-btn:hover{border-color:#cc5050;color:#ee8080;}
 
 @media(max-width:600px){
   .flipbook-wrapper{grid-template-columns:32px 1fr 32px;gap:4px;}
@@ -170,6 +193,7 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 <nav>
   <button class="active" onclick="showView('gallery')">Capítulos</button>
   <button id="nav-read" style="display:none" onclick="showView('reader')">Leyendo</button>
+  <button onclick="showView('admin')">Admin</button>
 </nav>
 
 <main>
@@ -209,6 +233,55 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
     <div class="page-ind" id="pind">— / —</div>
     <div class="hint">derecha → izquierda &nbsp;·&nbsp; toca la página para zoom &nbsp;·&nbsp; teclas ← →</div>
   </div>
+
+  <!-- ADMIN -->
+  <div id="admin-view" class="view">
+    <div class="lock-screen" id="lock">
+      <div style="font-size:2rem;margin-bottom:12px;opacity:.4">🔒</div>
+      <h3>Administración</h3>
+      <p>Ingresa la contraseña para continuar</p>
+      <input type="password" id="pw-input" placeholder="••••••••••••"
+             onkeydown="if(event.key==='Enter')checkPw()"/>
+      <button class="btn btn-ac" onclick="checkPw()" style="width:100%;padding:10px;">Entrar</button>
+      <div class="pw-err" id="pw-err"></div>
+    </div>
+
+    <div class="admin-panel" id="apanel">
+      <div class="sec">Panel de administración</div>
+
+      <div class="panel">
+        <h3>Registrar capítulo</h3>
+        <div class="info-box">
+          Sube primero el PDF a GitHub como <code>pdfs/cap-N.pdf</code>,
+          luego regístralo aquí. La web lo encontrará automáticamente.
+        </div>
+        <div class="fg">
+          <label>Número de capítulo</label>
+          <input type="number" id="cn" placeholder="ej. 1" min="1"/>
+        </div>
+        <div class="fg">
+          <label>Título</label>
+          <input type="text" id="ct" placeholder="ej. Soy la mejor de este lugar"/>
+        </div>
+        <div class="fg">
+          <label>Número de páginas (opcional)</label>
+          <input type="number" id="cpg" placeholder="ej. 24" min="1"/>
+        </div>
+        <button class="btn btn-ac" onclick="saveChap()" style="width:100%;padding:11px;">
+          ✦ Registrar capítulo
+        </button>
+        <div class="st" id="st"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Capítulos registrados</h3>
+        <div id="alist"></div>
+      </div>
+
+      <button class="btn" onclick="logout()"
+              style="font-size:.7rem;color:var(--dim);">Cerrar sesión</button>
+    </div>
+  </div>
 </main>
 
 <!-- ZOOM -->
@@ -216,40 +289,44 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
   <button id="zoom-close-btn" onclick="closeZoom()">✕</button>
   <img id="zoom-img" src="" alt="zoom" draggable="false"/>
   <div id="zoom-controls">
-    <button onclick="zoomOut()" title="Alejar">−</button>
-    <button onclick="zoomReset()" title="Restablecer">⊙</button>
-    <button onclick="zoomIn()" title="Acercar">+</button>
+    <button onclick="zoomOut()">−</button>
+    <button onclick="zoomReset()">⊙</button>
+    <button onclick="zoomIn()">+</button>
   </div>
 </div>
 
 <script>
 // ── CONFIG ────────────────────────────────────────────
+const PW_HASH  = hs('Golem heart:re');
 const PDF_BASE = 'pdfs/';
-// Lista de capítulos — edita esto cuando subas un capítulo nuevo a GitHub
-// Formato: { num: N, title: 'Título', pages: N }
-const CHAPTERS = [
-  { num: 2, title: 'Mi revancha', pages: null },
-  // Agrega más capítulos aquí cuando los subas:
-  // { num: 1, title: 'Soy la mejor de este lugar', pages: null },
-];
-
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 // ── STATE ─────────────────────────────────────────────
-let curChapNum = null, curPage = 0, totalPages = 0;
-let pdfDoc = null, flipping = false;
-let curDataUrl = null;
-let readSet = new Set(); // capítulos marcados como leídos
-
-// Zoom
+let chapters=[], readSet=new Set(), unlocked=false;
+let curPage=0, totalPages=0, pdfDoc=null, flipping=false, curDataUrl=null;
 let zScale=1, zX=0, zY=0;
-let isDragging=false, dragSX=0, dragSY=0, dragOX=0, dragOY=0;
-let lastPinch=null;
+let isDragging=false, dragSX=0, dragSY=0, dragOX=0, dragOY=0, lastPinch=null;
+
+// ── HASH ──────────────────────────────────────────────
+function hs(s){
+  let h=0;
+  for(let i=0;i<s.length;i++) h=Math.imul(31,h)+s.charCodeAt(i)|0;
+  return h.toString(16);
+}
+
+// ── STORAGE ───────────────────────────────────────────
+// Solo guarda metadata (números y títulos) — pesa bytes, nunca llena el localStorage
+function loadAll(){
+  try{ chapters = JSON.parse(localStorage.getItem('ac_meta')||'[]'); } catch(e){ chapters=[]; }
+  try{ readSet  = new Set(JSON.parse(localStorage.getItem('ac_read')||'[]')); } catch(e){ readSet=new Set(); }
+}
+function saveMeta(){ localStorage.setItem('ac_meta', JSON.stringify(chapters)); }
+function saveRead(){ localStorage.setItem('ac_read', JSON.stringify([...readSet])); }
 
 // ── INIT ──────────────────────────────────────────────
 (function init(){
-  loadRead();
+  loadAll();
   renderGallery();
   setupZoom();
   document.addEventListener('keydown', e=>{
@@ -270,56 +347,31 @@ let lastPinch=null;
   });
 })();
 
-// ── READ TRACKING ─────────────────────────────────────
-function loadRead(){
-  try{
-    const raw = localStorage.getItem('ac_read');
-    readSet = new Set(raw ? JSON.parse(raw) : []);
-  } catch(e){ readSet=new Set(); }
-}
-function saveRead(){
-  localStorage.setItem('ac_read', JSON.stringify([...readSet]));
-}
-function toggleRead(num, e){
-  e.stopPropagation(); // no abrir el capítulo
-  if(readSet.has(num)) readSet.delete(num);
-  else readSet.add(num);
-  saveRead();
-  // Actualizar solo esa tarjeta sin rerenderizar todo
-  const card = document.getElementById('card-'+num);
-  if(card){
-    card.classList.toggle('read', readSet.has(num));
-    const btn = card.querySelector('.mark-btn');
-    if(btn) btn.textContent = readSet.has(num) ? '✦ Leído' : '◇ Marcar como leído';
-  }
-}
-
 // ── VIEWS ─────────────────────────────────────────────
 function showView(v){
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
   document.getElementById(v+'-view').classList.add('active');
-  const idxMap={gallery:0,reader:1};
-  if(idxMap[v]!=null)
-    document.querySelectorAll('nav button')[idxMap[v]].classList.add('active');
+  ({gallery:0,reader:1,admin:2}[v]!=null) &&
+    document.querySelectorAll('nav button')[{gallery:0,reader:1,admin:2}[v]].classList.add('active');
   if(v==='gallery') renderGallery();
+  if(v==='admin')   renderAlist();
 }
 
 // ── GALLERY ───────────────────────────────────────────
 function renderGallery(){
   const g = document.getElementById('chap-grid');
-  if(!CHAPTERS.length){
+  const sorted = [...chapters].sort((a,b)=>a.num-b.num);
+  if(!sorted.length){
     g.innerHTML=`<div class="empty">
       <div style="font-size:2rem;opacity:.2;margin-bottom:14px">◆</div>
       <p>Aún no hay capítulos publicados.<br>¡Pronto habrá contenido aquí!</p>
     </div>`;
     return;
   }
-  const sorted = [...CHAPTERS].sort((a,b)=>a.num-b.num);
   g.innerHTML = sorted.map(ch=>{
     const isRead = readSet.has(ch.num);
-    return `
-    <div class="card${isRead?' read':''}" id="card-${ch.num}" onclick="openChap(${ch.num})">
+    return `<div class="card${isRead?' read':''}" id="card-${ch.num}" onclick="openChap(${ch.num})">
       <div class="read-badge">✦ Leído</div>
       <div class="thumb" id="th-${ch.num}">
         <div class="num">${ch.num}</div>
@@ -328,10 +380,10 @@ function renderGallery(){
       <div class="cinfo">
         <div class="cnum">CAPÍTULO ${ch.num}</div>
         <div class="ctitle">${ch.title||'Sin título'}</div>
-        <div class="cpages">${ch.pages ? ch.pages+' páginas' : '—'}</div>
+        <div class="cpages">${ch.pages?ch.pages+' páginas':'—'}</div>
       </div>
       <button class="mark-btn" onclick="toggleRead(${ch.num},event)">
-        ${isRead ? '✦ Leído' : '◇ Marcar como leído'}
+        ${isRead?'✦ Leído':'◇ Marcar como leído'}
       </button>
     </div>`;
   }).join('');
@@ -342,10 +394,10 @@ async function loadThumb(ch){
   try{
     const pdf = await pdfjsLib.getDocument(PDF_BASE+'cap-'+ch.num+'.pdf').promise;
     const p   = await pdf.getPage(1);
-    const vp  = p.getViewport({scale:0.5});
+    const vp  = p.getViewport({scale:.5});
     const c   = document.createElement('canvas');
     c.width=vp.width; c.height=vp.height;
-    await p.render({canvasContext:c.getContext('2d'), viewport:vp}).promise;
+    await p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
     const th = document.getElementById('th-'+ch.num);
     if(th){ th.innerHTML=''; th.appendChild(c); }
   } catch(e){
@@ -354,11 +406,24 @@ async function loadThumb(ch){
   }
 }
 
+// ── READ TRACKING ─────────────────────────────────────
+function toggleRead(num,e){
+  e.stopPropagation();
+  if(readSet.has(num)) readSet.delete(num); else readSet.add(num);
+  saveRead();
+  const card = document.getElementById('card-'+num);
+  if(card){
+    card.classList.toggle('read', readSet.has(num));
+    const btn = card.querySelector('.mark-btn');
+    if(btn) btn.textContent = readSet.has(num)?'✦ Leído':'◇ Marcar como leído';
+  }
+}
+
 // ── READER ────────────────────────────────────────────
 async function openChap(num){
-  const ch = CHAPTERS.find(c=>c.num===num);
-  if(!ch){ return; }
-  curChapNum=num; curPage=1; pdfDoc=null; curDataUrl=null;
+  const ch = chapters.find(c=>c.num===num);
+  if(!ch) return;
+  curPage=1; pdfDoc=null; curDataUrl=null;
   document.getElementById('r-title').textContent=`Cap. ${ch.num} — ${ch.title||''}`;
   document.getElementById('nav-read').style.display='';
   showView('reader');
@@ -368,8 +433,10 @@ async function openChap(num){
     totalPages = pdfDoc.numPages;
     await renderPage(1);
   } catch(e){
-    setFace(`<div class="pg-ph" style="cursor:default">No se encontró el PDF.<br>
-      <span style="font-size:.7rem;opacity:.6">Verifica que pdfs/cap-${num}.pdf existe en el repo.</span></div>`);
+    setFace(`<div class="pg-ph" style="cursor:default">
+      No se encontró el PDF.<br>
+      <span style="font-size:.7rem;opacity:.6">Verifica que <code>pdfs/cap-${num}.pdf</code> existe en GitHub.</span>
+    </div>`);
   }
 }
 
@@ -377,15 +444,14 @@ async function renderPage(n){
   if(!pdfDoc) return;
   const page   = await pdfDoc.getPage(n);
   const stage  = document.querySelector('.book-stage');
-  const availW = stage ? stage.getBoundingClientRect().width : window.innerWidth*0.9;
+  const availW = stage?stage.getBoundingClientRect().width:window.innerWidth*.9;
   const native = page.getViewport({scale:1});
-  const scale  = availW/native.width;
-  const vp     = page.getViewport({scale});
+  const vp     = page.getViewport({scale:availW/native.width});
   const canvas = document.createElement('canvas');
   canvas.width=vp.width; canvas.height=vp.height;
-  await page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise;
+  await page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;
   curDataUrl = canvas.toDataURL('image/png');
-  canvas.style.width='100%'; canvas.style.height='auto'; canvas.style.display='block';
+  canvas.style.cssText='width:100%;height:auto;display:block;';
   setFace('');
   document.getElementById('page-face').appendChild(canvas);
   updInd();
@@ -406,12 +472,10 @@ function flip(dir){
   if(next<1||next>totalPages) return;
   flipping=true;
   const wrap=document.getElementById('page-wrap');
-  const co=dir===1?'flip-out':'flip-out-r';
-  const ci=dir===1?'flip-in':'flip-in-r';
+  const co=dir===1?'flip-out':'flip-out-r', ci=dir===1?'flip-in':'flip-in-r';
   wrap.classList.add(co);
   wrap.addEventListener('animationend', async()=>{
-    wrap.classList.remove(co);
-    curPage=next;
+    wrap.classList.remove(co); curPage=next;
     await renderPage(curPage);
     wrap.classList.add(ci);
     wrap.addEventListener('animationend',()=>{ wrap.classList.remove(ci); flipping=false; },{once:true});
@@ -431,21 +495,16 @@ function closeZoom(){
   document.getElementById('zoom-overlay').classList.remove('open');
   document.body.style.overflow='';
 }
-function applyZ(){
-  document.getElementById('zoom-img').style.transform=`translate(${zX}px,${zY}px) scale(${zScale})`;
-}
+function applyZ(){ document.getElementById('zoom-img').style.transform=`translate(${zX}px,${zY}px) scale(${zScale})`; }
 function zoomIn() { zScale=Math.min(zScale*1.3,6); applyZ(); }
-function zoomOut(){ zScale=Math.max(zScale/1.3,0.5); applyZ(); }
+function zoomOut(){ zScale=Math.max(zScale/1.3,.5); applyZ(); }
 function zoomReset(){ zScale=1; zX=0; zY=0; applyZ(); }
 
 function setupZoom(){
   const ov=document.getElementById('zoom-overlay');
   const img=document.getElementById('zoom-img');
-
   ov.addEventListener('click', e=>{ if(e.target===ov) closeZoom(); });
   ov.addEventListener('wheel', e=>{ e.preventDefault(); e.deltaY<0?zoomIn():zoomOut(); },{passive:false});
-
-  // Mouse drag
   ov.addEventListener('mousedown', e=>{
     if(e.target===ov) return;
     isDragging=true; dragSX=e.clientX; dragSY=e.clientY; dragOX=zX; dragOY=zY;
@@ -456,8 +515,6 @@ function setupZoom(){
     zX=dragOX+(e.clientX-dragSX); zY=dragOY+(e.clientY-dragSY); applyZ();
   });
   window.addEventListener('mouseup', ()=>{ isDragging=false; img.classList.remove('grabbing'); });
-
-  // Touch pinch + drag
   ov.addEventListener('touchstart', e=>{
     if(e.touches.length===2) lastPinch=pinchD(e.touches);
     else if(e.touches.length===1){
@@ -469,7 +526,7 @@ function setupZoom(){
     if(e.touches.length===2){
       e.preventDefault();
       const d=pinchD(e.touches);
-      if(lastPinch){ zScale=Math.min(Math.max(zScale*(d/lastPinch),0.5),6); applyZ(); }
+      if(lastPinch){ zScale=Math.min(Math.max(zScale*(d/lastPinch),.5),6); applyZ(); }
       lastPinch=d;
     } else if(e.touches.length===1&&isDragging){
       zX=dragOX+(e.touches[0].clientX-dragSX);
@@ -481,10 +538,79 @@ function setupZoom(){
     if(e.touches.length===0) isDragging=false;
   },{passive:true});
 }
-
 function pinchD(t){
   const dx=t[0].clientX-t[1].clientX, dy=t[0].clientY-t[1].clientY;
   return Math.sqrt(dx*dx+dy*dy);
+}
+
+// ── AUTH ──────────────────────────────────────────────
+function checkPw(){
+  const v=document.getElementById('pw-input').value;
+  if(hs(v)===PW_HASH){
+    unlocked=true;
+    document.getElementById('lock').style.display='none';
+    document.getElementById('apanel').classList.add('on');
+    document.getElementById('pw-err').textContent='';
+    renderAlist();
+  } else {
+    document.getElementById('pw-err').textContent='Contraseña incorrecta.';
+    document.getElementById('pw-input').value='';
+  }
+}
+function logout(){
+  unlocked=false;
+  document.getElementById('lock').style.display='';
+  document.getElementById('apanel').classList.remove('on');
+  document.getElementById('pw-input').value='';
+  showView('gallery');
+}
+
+// ── ADMIN ─────────────────────────────────────────────
+function saveChap(){
+  const num   = parseInt(document.getElementById('cn').value);
+  const title = document.getElementById('ct').value.trim();
+  const pages = parseInt(document.getElementById('cpg').value)||null;
+  if(!num||num<1){ showSt('Ingresa un número válido.','err'); return; }
+  if(!title){      showSt('Ingresa un título.','err'); return; }
+  const idx = chapters.findIndex(c=>c.num===num);
+  const data = {num, title, pages};
+  if(idx>=0){
+    if(!confirm(`Capítulo ${num} ya existe. ¿Reemplazar?`)) return;
+    chapters[idx]=data;
+  } else { chapters.push(data); }
+  saveMeta();
+  showSt(`✦ Capítulo ${num} registrado. No olvides subir pdfs/cap-${num}.pdf a GitHub.`,'ok');
+  document.getElementById('cn').value='';
+  document.getElementById('ct').value='';
+  document.getElementById('cpg').value='';
+  renderAlist(); renderGallery();
+}
+
+function showSt(msg,type){
+  const el=document.getElementById('st');
+  el.textContent=msg; el.className='st '+type;
+  setTimeout(()=>el.className='st',6000);
+}
+
+function renderAlist(){
+  if(!unlocked) return;
+  const el=document.getElementById('alist');
+  const sorted=[...chapters].sort((a,b)=>a.num-b.num);
+  if(!sorted.length){
+    el.innerHTML='<div style="font-size:.8rem;color:var(--dim)">No hay capítulos registrados aún.</div>';
+    return;
+  }
+  el.innerHTML=sorted.map(ch=>`
+    <div class="chap-row">
+      <div><span class="cr-num">CAP. ${ch.num}</span>${ch.title||'Sin título'}</div>
+      <button class="del-btn" onclick="delChap(${ch.num})">Eliminar</button>
+    </div>`).join('');
+}
+
+function delChap(num){
+  if(!confirm(`¿Eliminar registro del capítulo ${num}?`)) return;
+  chapters=chapters.filter(c=>c.num!==num);
+  saveMeta(); renderAlist(); renderGallery();
 }
 </script>
 </body>
