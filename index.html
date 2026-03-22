@@ -416,6 +416,31 @@ async function scanPdfChapters(){
 }
 
 function chapterPdfCandidates(num){
+  const local = [
+    `${PDF_BASE}cap${num}.pdf`,
+    `${PDF_BASE}cap-${num}.pdf`
+  ];
+  const gh = githubPagesPdfCandidates(num);
+  return [...local, ...gh];
+}
+
+function githubPagesPdfCandidates(num){
+  const host = location.hostname || '';
+  if(!host.endsWith('.github.io')) return [];
+  const owner = host.split('.')[0];
+  const seg = (location.pathname||'').split('/').filter(Boolean);
+  const repo = seg[0];
+  if(!owner || !repo) return [];
+  const bases = [
+    `https://media.githubusercontent.com/media/${owner}/${repo}/main/${PDF_BASE}`,
+    `https://media.githubusercontent.com/media/${owner}/${repo}/master/${PDF_BASE}`
+  ];
+  const out = [];
+  for(const base of bases){
+    out.push(`${base}cap${num}.pdf`);
+    out.push(`${base}cap-${num}.pdf`);
+  }
+  return out;
   return [
     `${PDF_BASE}cap${num}.pdf`,
     `${PDF_BASE}cap-${num}.pdf`
@@ -433,6 +458,12 @@ async function findPdfPath(num){
 
 async function pdfLooksValid(url){
   try{
+    const r = await fetch(url,{method:'GET',headers:{Range:'bytes=0-2047'},cache:'no-store'});
+    if(!(r.ok || r.status===206)) return false;
+    const b = await r.arrayBuffer();
+    if(b.byteLength<5) return false;
+    const head = new TextDecoder().decode(b.slice(0,64));
+    return head.includes('%PDF-');
     const r = await fetch(url,{method:'GET',headers:{Range:'bytes=0-1023'},cache:'no-store'});
     if(!(r.ok || r.status===206)) return false;
     const b = await r.arrayBuffer();
@@ -538,6 +569,7 @@ async function openChap(num){
   } catch(e){
     setFace(`<div class="pg-ph" style="cursor:default">
       No se pudo abrir el PDF.<br>
+      <span style="font-size:.7rem;opacity:.6">Verifica que exista <code>pdfs/cap${num}.pdf</code> o <code>pdfs/cap-${num}.pdf</code> y que sea PDF real (no puntero LFS).</span>
       <span style="font-size:.7rem;opacity:.6">Verifica que exista <code>pdfs/cap${num}.pdf</code> o <code>pdfs/cap-${num}.pdf</code> y que el archivo sea un PDF válido.</span>
     </div>`);
   }
