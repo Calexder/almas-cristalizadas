@@ -441,6 +441,10 @@ function githubPagesPdfCandidates(num){
     out.push(`${base}cap-${num}.pdf`);
   }
   return out;
+  return [
+    `${PDF_BASE}cap${num}.pdf`,
+    `${PDF_BASE}cap-${num}.pdf`
+  ];
 }
 
 async function findPdfPath(num){
@@ -460,6 +464,12 @@ async function pdfLooksValid(url){
     if(b.byteLength<5) return false;
     const head = new TextDecoder().decode(b.slice(0,64));
     return head.includes('%PDF-');
+    const r = await fetch(url,{method:'GET',headers:{Range:'bytes=0-1023'},cache:'no-store'});
+    if(!(r.ok || r.status===206)) return false;
+    const b = await r.arrayBuffer();
+    if(b.byteLength<5) return false;
+    const head = new TextDecoder().decode(b.slice(0,5));
+    return head === '%PDF-';
   } catch(e){
     return false;
   }
@@ -560,6 +570,7 @@ async function openChap(num){
     setFace(`<div class="pg-ph" style="cursor:default">
       No se pudo abrir el PDF.<br>
       <span style="font-size:.7rem;opacity:.6">Verifica que exista <code>pdfs/cap${num}.pdf</code> o <code>pdfs/cap-${num}.pdf</code> y que sea PDF real (no puntero LFS).</span>
+      <span style="font-size:.7rem;opacity:.6">Verifica que exista <code>pdfs/cap${num}.pdf</code> o <code>pdfs/cap-${num}.pdf</code> y que el archivo sea un PDF válido.</span>
     </div>`);
   }
 }
