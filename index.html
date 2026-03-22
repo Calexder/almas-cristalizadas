@@ -252,7 +252,7 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
       <div class="panel">
         <h3>Registrar capítulo</h3>
         <div class="info-box">
-          Sube primero el PDF a GitHub como <code>pdfs/cap-N.pdf</code>,
+          Sube primero el PDF a GitHub como <code>pdfs/capN.pdf</code> o <code>pdfs/cap-N.pdf</code>,
           luego regístralo aquí. La web lo encontrará automáticamente.
         </div>
         <div class="fg">
@@ -299,6 +299,8 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 // ── CONFIG ────────────────────────────────────────────
 const PW_HASH  = hs('Golem heart:re');
 const PDF_BASE = 'pdfs/';
+const CHAPTER_SCAN_MAX = 120;
+const CHAPTER_SCAN_MAX_MISSES = 20;
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -307,6 +309,7 @@ let chapters=[], readSet=new Set(), unlocked=false;
 let curPage=0, totalPages=0, pdfDoc=null, flipping=false, curDataUrl=null;
 let zScale=1, zX=0, zY=0;
 let isDragging=false, dragSX=0, dragSY=0, dragOX=0, dragOY=0, lastPinch=null;
+const pdfPathByChapter = {};
 
 // ── HASH ──────────────────────────────────────────────
 function hs(s){
@@ -318,17 +321,43 @@ function hs(s){
 // ── STORAGE ───────────────────────────────────────────
 // Solo guarda metadata (números y títulos) — pesa bytes, nunca llena el localStorage
 function loadAll(){
-  try{ chapters = JSON.parse(localStorage.getItem('ac_meta')||'[]'); } catch(e){ chapters=[]; }
+  try{ chapters = normalizeMeta(JSON.parse(localStorage.getItem('ac_meta')||'[]')); } catch(e){ chapters=[]; }
   try{ readSet  = new Set(JSON.parse(localStorage.getItem('ac_read')||'[]')); } catch(e){ readSet=new Set(); }
 }
 function saveMeta(){ localStorage.setItem('ac_meta', JSON.stringify(chapters)); }
 function saveRead(){ localStorage.setItem('ac_read', JSON.stringify([...readSet])); }
+
+function normalizeMeta(meta){
+  if(!Array.isArray(meta)) return [];
+  const out = [];
+  const seen = new Set();
+  for(const it of meta){
+    const num = parseInt(it?.num,10);
+    if(!num || num<1 || seen.has(num)) continue;
+    const titleRaw = String(it?.title||`Capítulo ${num}`);
+    const title = titleRaw.replace(/[\u0000-\u001F\u007F]/g,'').slice(0,120).trim() || `Capítulo ${num}`;
+    const pages = parseInt(it?.pages,10);
+    out.push({ num, title, pages: pages>0?pages:null, auto: it?.auto===true });
+    seen.add(num);
+  }
+  return out.sort((a,b)=>a.num-b.num);
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
 
 // ── INIT ──────────────────────────────────────────────
 (function init(){
   loadAll();
   renderGallery();
   setupZoom();
+  syncChaptersFromRepository()
+    .then(()=>{
+      renderGallery();
+      if(unlocked) renderAlist();
+    })
+    .catch(()=>{});
   document.addEventListener('keydown', e=>{
     const inReader = document.getElementById('reader-view').classList.contains('active');
     const zOpen    = document.getElementById('zoom-overlay').classList.contains('open');
@@ -346,6 +375,95 @@ function saveRead(){ localStorage.setItem('ac_read', JSON.stringify([...readSet]
     }
   });
 })();
+
+async function syncChaptersFromRepository(){
+  const found = await scanPdfChapters();
+  const foundNums = new Set();
+  for(const item of found){
+    pdfPathByChapter[item.num] = item.path;
+    foundNums.add(item.num);
+  }
+
+  const manual = chapters.filter(c=>c && c.auto!==true);
+  const manualNums = new Set(manual.map(c=>c.num));
+  const autoDetected = [];
+  for(const num of [...foundNums].sort((a,b)=>a-b)){
+    if(manualNums.has(num)) continue;
+    autoDetected.push({num, title:`Capítulo ${num}`, pages:null, auto:true});
+  }
+
+  const next = [...manual, ...autoDetected].sort((a,b)=>a.num-b.num);
+  const prevStr = JSON.stringify(chapters);
+  const nextStr = JSON.stringify(next);
+  chapters = next;
+  if(prevStr!==nextStr) saveMeta();
+}
+
+async function scanPdfChapters(){
+  const found = [];
+  let misses = 0;
+  for(let n=1;n<=CHAPTER_SCAN_MAX;n++){
+    const path = await findPdfPath(n);
+    if(path){
+      found.push({num:n, path});
+      misses = 0;
+      continue;
+    }
+    misses++;
+    if(misses>=CHAPTER_SCAN_MAX_MISSES) break;
+  }
+  return found;
+}
+
+function chapterPdfCandidates(num){
+  const local = [
+    `${PDF_BASE}cap${num}.pdf`,
+    `${PDF_BASE}cap-${num}.pdf`
+  ];
+  const gh = githubPagesPdfCandidates(num);
+  return [...local, ...gh];
+}
+
+function githubPagesPdfCandidates(num){
+  const host = location.hostname || '';
+  if(!host.endsWith('.github.io')) return [];
+  const owner = host.split('.')[0];
+  const seg = (location.pathname||'').split('/').filter(Boolean);
+  const repo = seg[0];
+  if(!owner || !repo) return [];
+  const bases = [
+    `https://media.githubusercontent.com/media/${owner}/${repo}/main/${PDF_BASE}`,
+    `https://media.githubusercontent.com/media/${owner}/${repo}/master/${PDF_BASE}`
+  ];
+  const out = [];
+  for(const base of bases){
+    out.push(`${base}cap${num}.pdf`);
+    out.push(`${base}cap-${num}.pdf`);
+  }
+  return out;
+}
+
+async function findPdfPath(num){
+  if(pdfPathByChapter[num]) return pdfPathByChapter[num];
+  const candidates = chapterPdfCandidates(num);
+  for(const path of candidates){
+    if(await pdfLooksValid(path)) return path;
+  }
+  return null;
+}
+
+async function pdfLooksValid(url){
+  try{
+    const r = await fetch(url,{method:'GET',headers:{Range:'bytes=0-2047'},cache:'no-store'});
+    if(!(r.ok || r.status===206)) return false;
+    const b = await r.arrayBuffer();
+    if(b.byteLength<5) return false;
+    const head = new TextDecoder().decode(b.slice(0,64));
+    return head.includes('%PDF-');
+  } catch(e){
+    return false;
+  }
+}
 
 // ── VIEWS ─────────────────────────────────────────────
 function showView(v){
@@ -379,7 +497,7 @@ function renderGallery(){
       </div>
       <div class="cinfo">
         <div class="cnum">CAPÍTULO ${ch.num}</div>
-        <div class="ctitle">${ch.title||'Sin título'}</div>
+        <div class="ctitle">${escapeHtml(ch.title||'Sin título')}</div>
         <div class="cpages">${ch.pages?ch.pages+' páginas':'—'}</div>
       </div>
       <button class="mark-btn" onclick="toggleRead(${ch.num},event)">
@@ -392,7 +510,10 @@ function renderGallery(){
 
 async function loadThumb(ch){
   try{
-    const pdf = await pdfjsLib.getDocument(PDF_BASE+'cap-'+ch.num+'.pdf').promise;
+    const pdfPath = await findPdfPath(ch.num);
+    if(!pdfPath) throw new Error('PDF not found');
+    pdfPathByChapter[ch.num]=pdfPath;
+    const pdf = await pdfjsLib.getDocument(pdfPath).promise;
     const p   = await pdf.getPage(1);
     const vp  = p.getViewport({scale:.5});
     const c   = document.createElement('canvas');
@@ -429,13 +550,16 @@ async function openChap(num){
   showView('reader');
   setFace('<div class="pg-ph"><div style="font-size:1.5rem;opacity:.4">◆</div><span>Cargando PDF…</span></div>');
   try{
-    pdfDoc     = await pdfjsLib.getDocument(PDF_BASE+'cap-'+num+'.pdf').promise;
+    const pdfPath = await findPdfPath(num);
+    if(!pdfPath) throw new Error('PDF not found');
+    pdfPathByChapter[num]=pdfPath;
+    pdfDoc     = await pdfjsLib.getDocument(pdfPath).promise;
     totalPages = pdfDoc.numPages;
     await renderPage(1);
   } catch(e){
     setFace(`<div class="pg-ph" style="cursor:default">
-      No se encontró el PDF.<br>
-      <span style="font-size:.7rem;opacity:.6">Verifica que <code>pdfs/cap-${num}.pdf</code> existe en GitHub.</span>
+      No se pudo abrir el PDF.<br>
+      <span style="font-size:.7rem;opacity:.6">Verifica que exista <code>pdfs/cap${num}.pdf</code> o <code>pdfs/cap-${num}.pdf</code> y que sea PDF real (no puntero LFS).</span>
     </div>`);
   }
 }
@@ -573,13 +697,13 @@ function saveChap(){
   if(!num||num<1){ showSt('Ingresa un número válido.','err'); return; }
   if(!title){      showSt('Ingresa un título.','err'); return; }
   const idx = chapters.findIndex(c=>c.num===num);
-  const data = {num, title, pages};
+  const data = {num, title, pages, auto:false};
   if(idx>=0){
     if(!confirm(`Capítulo ${num} ya existe. ¿Reemplazar?`)) return;
     chapters[idx]=data;
   } else { chapters.push(data); }
   saveMeta();
-  showSt(`✦ Capítulo ${num} registrado. No olvides subir pdfs/cap-${num}.pdf a GitHub.`,'ok');
+  showSt(`✦ Capítulo ${num} registrado. Sube ${PDF_BASE}cap${num}.pdf (o cap-${num}.pdf) al repositorio.`,'ok');
   document.getElementById('cn').value='';
   document.getElementById('ct').value='';
   document.getElementById('cpg').value='';
@@ -602,7 +726,7 @@ function renderAlist(){
   }
   el.innerHTML=sorted.map(ch=>`
     <div class="chap-row">
-      <div><span class="cr-num">CAP. ${ch.num}</span>${ch.title||'Sin título'}</div>
+      <div><span class="cr-num">CAP. ${ch.num}</span>${escapeHtml(ch.title||'Sin título')}</div>
       <button class="del-btn" onclick="delChap(${ch.num})">Eliminar</button>
     </div>`).join('');
 }
