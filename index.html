@@ -299,7 +299,8 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 // ── CONFIG ────────────────────────────────────────────
 const PW_HASH  = hs('Golem heart:re');
 const PDF_BASE = 'pdfs/';
-const CHAPTER_SCAN_MAX = 200;
+const CHAPTER_SCAN_MAX = 120;
+const CHAPTER_SCAN_MAX_MISSES = 20;
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -327,11 +328,16 @@ function saveMeta(){ localStorage.setItem('ac_meta', JSON.stringify(chapters)); 
 function saveRead(){ localStorage.setItem('ac_read', JSON.stringify([...readSet])); }
 
 // ── INIT ──────────────────────────────────────────────
-(async function init(){
+(function init(){
   loadAll();
-  await syncChaptersFromRepository();
   renderGallery();
   setupZoom();
+  syncChaptersFromRepository()
+    .then(()=>{
+      renderGallery();
+      if(unlocked) renderAlist();
+    })
+    .catch(()=>{});
   document.addEventListener('keydown', e=>{
     const inReader = document.getElementById('reader-view').classList.contains('active');
     const zOpen    = document.getElementById('zoom-overlay').classList.contains('open');
@@ -384,7 +390,7 @@ async function scanPdfChapters(){
       continue;
     }
     misses++;
-    if(found.length && misses>=8) break;
+    if(misses>=CHAPTER_SCAN_MAX_MISSES) break;
   }
   return found;
 }
