@@ -420,17 +420,29 @@ function renderGallery(){
 async function findPdfPath(num) {
   const pad = num < 10 ? '0' + num : num;
   const candidates = [
-    `${PDF_BASE}cap-${num}.pdf`,
     `${PDF_BASE}cap${num}.pdf`,
-    `${PDF_BASE}cap${pad}.pdf`
+    `${PDF_BASE}cap-${num}.pdf`,
+    `${PDF_BASE}cap${pad}.pdf`,
+    `./${PDF_BASE}cap${num}.pdf`,
+    `./${PDF_BASE}cap-${num}.pdf`
   ];
+  
+  console.log(`Buscando PDF para capítulo ${num}...`);
   
   for (const path of candidates) {
     try {
-      const res = await fetch(path, { method: 'HEAD' });
-      if (res.ok) return path;
-    } catch (e) {}
+      // Usamos un fetch simple. Algunos servidores (como local o ciertos proxies) 
+      // no manejan bien el método HEAD.
+      const res = await fetch(path);
+      if (res.ok) {
+        console.log(`¡Encontrado!: ${path}`);
+        return path;
+      }
+    } catch (e) {
+      console.error(`Error probando ruta ${path}:`, e);
+    }
   }
+  console.warn(`No se encontró ningún PDF para el capítulo ${num} en las rutas probadas.`);
   return null;
 }
 
