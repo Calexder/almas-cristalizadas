@@ -216,13 +216,18 @@ function renderGallery(){
     el.innerHTML = '<div class="empty">No hay capítulos detectados todavía.</div>';
     return;
   }
-  el.innerHTML = chapters.map(ch=>`
-    <article class="card" onclick="openChapter(${ch.num})">
-      <div class="thumb" id="thumb-${ch.num}">Cargando portada…</div>
-      <div class="meta">
-        <div class="n">CAPÍTULO ${ch.num}</div>
-        <div class="t">${escapeHtml(ch.title||`Capítulo ${ch.num}`)}</div>
-        <div class="p">${ch.pages?`${ch.pages} páginas`:'—'}</div>
+  g.innerHTML = sorted.map(ch=>{
+    const isRead = readSet.has(ch.num);
+    return `<div class="card${isRead?' read':''}" id="card-${ch.num}" onclick="openChap(${ch.num})">
+      <div class="read-badge">✦ Leído</div>
+      <div class="thumb" id="th-${ch.num}">
+        <div class="num">${ch.num}</div>
+        <div class="ltxt">Cargando portada…</div>
+      </div>
+      <div class="cinfo">
+        <div class="cnum">CAPÍTULO ${ch.num}</div>
+        <div class="ctitle">${escapeHtml(ch.title||'Sin título')}</div>
+        <div class="cpages">${ch.pages?ch.pages+' páginas':'—'}</div>
       </div>
     </article>
   `).join('');
@@ -233,18 +238,20 @@ async function loadThumb(num){
   const el = document.getElementById(`thumb-${num}`);
   if(!el) return;
   try{
-    const path = await detectPdfPath(num);
-    if(!path){ el.textContent='Sin PDF'; return; }
-    const doc = await pdfjsLib.getDocument(path).promise;
-    const page = await doc.getPage(1);
-    const vp = page.getViewport({scale:.45});
-    const cv = document.createElement('canvas');
-    cv.width = vp.width; cv.height = vp.height;
-    await page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;
-    el.innerHTML='';
-    el.appendChild(cv);
-  }catch(_){
-    el.textContent='PDF inválido';
+    const pdfPath = await findPdfPath(ch.num);
+    if(!pdfPath) throw new Error('PDF not found');
+    pdfPathByChapter[ch.num]=pdfPath;
+    const pdf = await pdfjsLib.getDocument(pdfPath).promise;
+    const p   = await pdf.getPage(1);
+    const vp  = p.getViewport({scale:.5});
+    const c   = document.createElement('canvas');
+    c.width=vp.width; c.height=vp.height;
+    await p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+    const th = document.getElementById('th-'+ch.num);
+    if(th){ th.innerHTML=''; th.appendChild(c); }
+  } catch(e){
+    const th = document.getElementById('th-'+ch.num);
+    if(th){ const lt=th.querySelector('.ltxt'); if(lt) lt.textContent='Sin portada'; }
   }
 }
 
@@ -256,20 +263,18 @@ async function openChapter(num){
   showView('reader');
   document.getElementById('page-face').textContent='Cargando PDF…';
   try{
-    const path = await detectPdfPath(num);
-    if(!path) throw new Error('not-found');
-    pdfDoc = await pdfjsLib.getDocument(path).promise;
-    curPage = 1;
+    const pdfPath = await findPdfPath(num);
+    if(!pdfPath) throw new Error('PDF not found');
+    pdfPathByChapter[num]=pdfPath;
+    pdfDoc     = await pdfjsLib.getDocument(pdfPath).promise;
     totalPages = pdfDoc.numPages;
-    await renderPage(curPage);
-  }catch(_){
-    pdfDoc=null; totalPages=0; curPage=0;
-    document.getElementById('page-face').innerHTML = `
-      <div style="text-align:center;color:var(--muted)">
-        No se pudo abrir el PDF.<br>
-        <span style="font-size:.8rem">Ruta esperada: <code>pdfs/cap${num}.pdf</code> o <code>pdfs/cap-${num}.pdf</code>.</span>
-      </div>`;
-    updateReaderUI();
+    await renderPage(1);
+  } catch(e){
+    setFace(`<div class="pg-ph" style="cursor:default">
+      No se pudo abrir el PDF.<br>
+      <span style="font-size:.7rem;opacity:.6">Verifica que exista <code>pdfs/cap${num}.pdf</code> o <code>pdfs/cap-${num}.pdf</code> y que sea PDF real (no puntero LFS).</span>
+      <span style="font-size:.7rem;opacity:.6">Verifica que exista <code>pdfs/cap${num}.pdf</code> o <code>pdfs/cap-${num}.pdf</code> y que el archivo sea un PDF válido.</span>
+    </div>`);
   }
 }
 
