@@ -220,6 +220,7 @@
       touch-action: none;
       cursor: zoom-in;
       transform-style: preserve-3d;
+      will-change: transform, opacity;
     }
     
     /* Animaciones de Flip */
@@ -253,13 +254,15 @@
       transition: transform 0.2s ease;
       pointer-events: auto;
       cursor: inherit;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     #page-face.zoomed img, #page-face.zoomed canvas { 
       max-width: none; 
       max-height: none;
       width: auto;
-      cursor: zoom-out;
+      cursor: inherit;
     }
 
     .bar { margin-top: 20px; height: 4px; background: var(--bg2); border-radius: 2px; overflow: hidden; }
@@ -754,3 +757,4 @@ initReaderInteractions();
 </script>
 </body>
 </html>
+
