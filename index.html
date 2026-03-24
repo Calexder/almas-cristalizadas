@@ -564,6 +564,7 @@ async function renderPage(n){
   const img = new Image();
   img.src = canvas.toDataURL('image/jpeg', 0.9);
   img.alt = `Página ${n}`;
+  img.draggable = false; // Bloquea el arrastre nativo del navegador
   
   face.appendChild(img);
   updateReaderUI();
@@ -617,6 +618,7 @@ function initReaderInteractions() {
     dragStartPos = { x: e.clientX, y: e.clientY };
     
     if (face.classList.contains('zoomed')) {
+      e.preventDefault(); // CRÍTICO: Evita que el navegador intente "sacar" la imagen
       isDragging = true;
       face.classList.add('dragging');
       startX = e.pageX - face.offsetLeft;
@@ -638,10 +640,9 @@ function initReaderInteractions() {
   });
 
   window.addEventListener('mouseup', e => {
-    if (isDragging) {
-      isDragging = false;
-      face.classList.remove('dragging');
-    }
+    // Siempre quitar el estado de dragging al soltar
+    isDragging = false;
+    face.classList.remove('dragging');
 
     const duration = Date.now() - dragStartTime;
     const dist = Math.hypot(e.clientX - dragStartPos.x, e.clientY - dragStartPos.y);
@@ -797,3 +798,4 @@ initReaderInteractions();
 </script>
 </body>
 </html>
+
