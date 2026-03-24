@@ -205,10 +205,10 @@
       display: flex; 
       align-items: center; 
       justify-content: center; 
-      padding: 20px; 
+      padding: 10px; 
       border-radius: 8px;
       overflow: hidden;
-      max-height: 85vh;
+      height: 85vh;
       position: relative;
       touch-action: none;
       cursor: zoom-in;
@@ -226,7 +226,10 @@
 
     #page-face img, #page-face canvas { 
       max-width: 100%; 
-      height: auto !important; 
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
       box-shadow: 0 10px 40px rgba(0,0,0,0.5);
       transition: transform 0.2s ease;
       pointer-events: auto;
@@ -234,6 +237,7 @@
 
     #page-face.zoomed img, #page-face.zoomed canvas { 
       max-width: none; 
+      max-height: none;
       width: auto;
       cursor: zoom-out;
     }
