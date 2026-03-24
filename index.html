@@ -299,7 +299,7 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 20p
 <script>
 // ── CONFIG ────────────────────────────────────────────
 const PW_HASH  = hs('Golem heart:re');
-const PDF_BASE = 'pdfs/cap';
+const PDF_BASE = 'pdfs/';
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -391,7 +391,6 @@ function renderGallery(){
   sorted.forEach(ch=>loadThumb(ch));
 }
 
-// Busca el PDF con o sin guión, con o sin cero inicial
 async function findPdfPath(num){
   const pad = num < 10 ? '0'+num : num;
   const candidates = [
