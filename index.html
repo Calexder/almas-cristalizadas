@@ -564,10 +564,6 @@ async function renderPage(n){
   const img = new Image();
   img.src = canvas.toDataURL('image/jpeg', 0.9);
   img.alt = `Página ${n}`;
-  img.onclick = (e) => {
-    // Solo toggle si no estábamos arrastrando
-    if (!isDraggingMoved) toggleZoom();
-  };
   
   face.appendChild(img);
   updateReaderUI();
@@ -607,7 +603,8 @@ function flip(dir){
 }
 
 let isDragging = false;
-let isDraggingMoved = false;
+let dragStartTime = 0;
+let dragStartPos = { x: 0, y: 0 };
 let startX, startY, scrollLeft, scrollTop;
 let lastTouchEnd = 0;
 let initialPinchDist = -1;
@@ -615,34 +612,47 @@ let initialPinchDist = -1;
 function initReaderInteractions() {
   const face = document.getElementById('page-face');
   
-  const startAction = (x, y) => {
-    if (!face.classList.contains('zoomed')) return;
-    isDragging = true;
-    isDraggingMoved = false;
-    face.classList.add('dragging');
-    startX = x - face.offsetLeft;
-    startY = y - face.offsetTop;
-    scrollLeft = face.scrollLeft;
-    scrollTop = face.scrollTop;
-  };
+  face.addEventListener('mousedown', e => {
+    dragStartTime = Date.now();
+    dragStartPos = { x: e.clientX, y: e.clientY };
+    
+    if (face.classList.contains('zoomed')) {
+      isDragging = true;
+      face.classList.add('dragging');
+      startX = e.pageX - face.offsetLeft;
+      startY = e.pageY - face.offsetTop;
+      scrollLeft = face.scrollLeft;
+      scrollTop = face.scrollTop;
+    }
+  });
 
-  const moveAction = (x, y) => {
+  window.addEventListener('mousemove', e => {
     if (!isDragging) return;
-    const dx = x - face.offsetLeft - startX;
-    const dy = y - face.offsetTop - startY;
-    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) isDraggingMoved = true;
-    face.scrollLeft = scrollLeft - dx;
-    face.scrollTop = scrollTop - dy;
-  };
+    e.preventDefault();
+    const x = e.pageX - face.offsetLeft;
+    const y = e.pageY - face.offsetTop;
+    const walkX = (x - startX);
+    const walkY = (y - startY);
+    face.scrollLeft = scrollLeft - walkX;
+    face.scrollTop = scrollTop - walkY;
+  });
 
-  const endAction = () => {
-    isDragging = false;
-    face.classList.remove('dragging');
-  };
+  window.addEventListener('mouseup', e => {
+    if (isDragging) {
+      isDragging = false;
+      face.classList.remove('dragging');
+    }
 
-  face.addEventListener('mousedown', e => startAction(e.pageX, e.pageY));
-  window.addEventListener('mousemove', e => moveAction(e.pageX, e.pageY));
-  window.addEventListener('mouseup', endAction);
+    const duration = Date.now() - dragStartTime;
+    const dist = Math.hypot(e.clientX - dragStartPos.x, e.clientY - dragStartPos.y);
+    
+    // Si es un clic rápido y no se movió apenas, toggle zoom
+    if (duration < 250 && dist < 10) {
+      if (e.target.tagName === 'IMG' || e.target.id === 'page-face') {
+        toggleZoom(e);
+      }
+    }
+  });
 
   face.addEventListener('touchstart', e => {
     if (e.touches.length === 2) {
@@ -651,7 +661,15 @@ function initReaderInteractions() {
         e.touches[0].pageY - e.touches[1].pageY
       );
     } else if (e.touches.length === 1) {
-      startAction(e.touches[0].pageX, e.touches[0].pageY);
+      dragStartTime = Date.now();
+      dragStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      if (face.classList.contains('zoomed')) {
+        isDragging = true;
+        startX = e.touches[0].pageX - face.offsetLeft;
+        startY = e.touches[0].pageY - face.offsetTop;
+        scrollLeft = face.scrollLeft;
+        scrollTop = face.scrollTop;
+      }
     }
   }, { passive: false });
 
@@ -668,12 +686,15 @@ function initReaderInteractions() {
         initialPinchDist = dist;
       }
     } else if (isDragging && e.touches.length === 1) {
-      moveAction(e.touches[0].pageX, e.touches[0].pageY);
+      const x = e.touches[0].pageX - face.offsetLeft;
+      const y = e.touches[0].pageY - face.offsetTop;
+      face.scrollLeft = scrollLeft - (x - startX);
+      face.scrollTop = scrollTop - (y - startY);
     }
   }, { passive: false });
 
   face.addEventListener('touchend', e => {
-    endAction();
+    isDragging = false;
     initialPinchDist = -1;
     const now = Date.now();
     if (now - lastTouchEnd <= 300) {
@@ -684,10 +705,29 @@ function initReaderInteractions() {
   });
 }
 
-function toggleZoom(){
+function toggleZoom(e){
   const face = document.getElementById('page-face');
-  face.classList.toggle('zoomed');
-  if(!face.classList.contains('zoomed')){
+  const isZoomingIn = !face.classList.contains('zoomed');
+  
+  if (isZoomingIn) {
+    // Coordenadas relativas al contenedor antes del zoom
+    const rect = face.getBoundingClientRect();
+    const x = e ? (e.clientX - rect.left) : (rect.width / 2);
+    const y = e ? (e.clientY - rect.top) : (rect.height / 2);
+    
+    // Guardamos la posición relativa (porcentaje) del clic
+    const relX = (x + face.scrollLeft) / (face.scrollWidth || 1);
+    const relY = (y + face.scrollTop) / (face.scrollHeight || 1);
+
+    face.classList.add('zoomed');
+    
+    // Ajustamos el scroll para centrar en el punto del clic
+    requestAnimationFrame(() => {
+      face.scrollLeft = (relX * face.scrollWidth) - x;
+      face.scrollTop = (relY * face.scrollHeight) - y;
+    });
+  } else {
+    face.classList.remove('zoomed');
     face.scrollLeft = 0;
     face.scrollTop = 0;
   }
@@ -757,4 +797,3 @@ initReaderInteractions();
 </script>
 </body>
 </html>
-
